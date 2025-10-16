@@ -1,0 +1,22 @@
+stages:
+  - build
+
+build-arm:
+  stage: build
+  image: ubuntu:20.04
+  
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq gcc-arm-linux-gnueabi g++-arm-linux-gnueabi qt4-dev-tools libqt4-dev cmake
+  
+  script:
+    - mkdir build
+    - cd build
+    - cmake .. -DCMAKE_C_COMPILER=arm-linux-gnueabi-gcc -DCMAKE_CXX_COMPILER=arm-linux-gnueabi-g++ -DCMAKE_CXX_FLAGS="-march=armv5te -msoft-float" -DCMAKE_C_FLAGS="-march=armv5te -msoft-float" -DCMAKE_BUILD_TYPE=Release
+    - make
+    - arm-linux-gnueabi-strip JsonFetcher || true
+  
+  artifacts:
+    paths:
+      - build/JsonFetcher
+    expire_in: 30 days
