@@ -3,9 +3,7 @@ name: Build ARM Binary
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch:
 
 jobs:
   build-arm:
@@ -15,34 +13,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
     
-    - name: Install ARM toolchain and Qt4
+    - name: Install ARM toolchain
       run: |
         sudo apt-get update
         sudo apt-get install -y gcc-arm-linux-gnueabi g++-arm-linux-gnueabi
-        sudo apt-get install -y qt4-dev-tools libqt4-dev cmake
     
-    - name: Create build directory
-      run: mkdir build
+    - name: Compile
+      run: arm-linux-gnueabi-g++ -o JsonFetcher main.cpp -static
     
-    - name: Configure CMake for ARM
-      working-directory: build
-      run: |
-        cmake .. \
-          -DCMAKE_C_COMPILER=arm-linux-gnueabi-gcc \
-          -DCMAKE_CXX_COMPILER=arm-linux-gnueabi-g++ \
-          -DCMAKE_BUILD_TYPE=Release
-    
-    - name: Build
-      working-directory: build
-      run: make
-    
-    - name: Strip binary (reduce size)
-      working-directory: build
+    - name: Strip binary
       run: arm-linux-gnueabi-strip JsonFetcher
     
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: jsonfetcher-arm
-        path: build/JsonFetcher
+        path: JsonFetcher
         retention-days: 30
