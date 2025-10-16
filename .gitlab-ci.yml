@@ -3,7 +3,7 @@ stages:
 
 build-arm:
   stage: build
-  image: ubuntu:20.04
+  image: ubuntu:18.04
   
   before_script:
     - apt-get update -qq
